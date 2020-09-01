@@ -16,7 +16,7 @@
     </head>
 
     <body class="h-full">
-        <main class="flex justify-center items-center h-full bg-gray-100">
+        <main class="flex justify-center items-center bg-gray-200 h-full">
             @livewire('image-handler')
         </main>
 
