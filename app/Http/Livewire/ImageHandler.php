@@ -11,13 +11,21 @@ class ImageHandler extends Component
     use WithFileUploads;
 
     /**
-     * @var TemporaryUploadedFile
+     * @var TemporaryUploadedFile|null
      */
-    public $image;
+    public $image = null;
 
-    public function save()
+    /**
+     * @var string[]
+     */
+    protected $listeners = ['imageUploaded' => 'setImage'];
+
+    /**
+     * @param string $fileName
+     */
+    public function setImage(string $fileName): void
     {
-        dd($this->image);
+        $this->image = TemporaryUploadedFile::unserializeFromLivewireRequest($fileName);
     }
 
     public function render()
