@@ -5,33 +5,57 @@ namespace App\Http\Livewire;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Livewire\Component;
-use Livewire\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Spatie\Image\Image;
+use Spatie\Image\Manipulations;
 
 class ImageHandler extends Component
 {
     use WithFileUploads;
 
     /**
-     * @var TemporaryUploadedFile|null
+     * @var string|null
      */
-    public $image = null;
+    public ?string $image = null;
 
     /**
      * @var string
      */
-    public $fileName;
+    public string $fileName = '';
+
+    /**
+     * @var string
+     */
+    public string $originalFileName = '';
+
+    /**
+     * @var array
+     */
+    public array $manipulations = [];
 
     /**
      * @var string[]
      */
-    protected $listeners = ['imageUploaded' => 'setImage'];
+    protected $listeners = ['imageUploaded' => 'handleNewImage'];
 
-    public function mount()
+    public function mount(): void
     {
-        $this->disk = Storage::disk('manipulated_images');
+        // Reset image and load test image while deving
+        $this->getDisk()->delete($this->getDisk()->allFiles());
+        $testFile = Storage::disk('original_images')->get('test.jpeg');
+        $this->getDisk()->put('test.jpeg', $testFile);
+        $this->handleNewImage('test.jpeg');
+    }
+
+    /**
+     * @param string $fileName
+     */
+    public function handleNewImage(string $fileName): void
+    {
+        $this->originalFileName = $fileName;
+        $this->setImage($fileName);
     }
 
     /**
@@ -43,14 +67,14 @@ class ImageHandler extends Component
         $this->image = $this->getDisk()->url($fileName);
     }
 
-    public function manipulate()
+    public function manipulate(Manipulations $manipulations): void
     {
         $oldFileName = $this->fileName;
         $newFileName = Str::random(32) . '.jpeg';
 
-        Image::load($this->getDisk()->path($oldFileName))
+        Image::load($this->getOriginalDisk()->path($this->originalFileName))
             ->setTemporaryDirectory('temp')
-            ->greyscale()
+            ->manipulate($manipulations)
             ->save($this->getDisk()->path($newFileName));
 
         $this->setImage($newFileName);
@@ -58,6 +82,22 @@ class ImageHandler extends Component
         $this->getDisk()->delete($oldFileName);
     }
 
+    public function updatedManipulations(): void
+    {
+        $manipulations = new Manipulations();
+
+        foreach ($this->manipulations as $manipulation) {
+            if (method_exists($manipulations, $manipulation)) {
+                $manipulations->{$manipulation}();
+            }
+        }
+
+        $this->manipulate($manipulations);
+    }
+
+    /**
+     * @return View
+     */
     public function render()
     {
         return view('livewire.image-handler');
@@ -69,5 +109,13 @@ class ImageHandler extends Component
     private function getDisk(): Filesystem
     {
         return Storage::disk('manipulated_images');
+    }
+
+    /**
+     * @return Filesystem
+     */
+    private function getOriginalDisk(): Filesystem
+    {
+        return Storage::disk('original_images');
     }
 }
