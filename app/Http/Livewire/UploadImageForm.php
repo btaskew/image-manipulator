@@ -17,7 +17,10 @@ class UploadImageForm extends Component
 
     public function useImage(): void
     {
-        $this->emit('imageUploaded', $this->image->serializeForLivewireResponse());
+        $fileName = $this->image->hashName();
+        $this->image->storeAs('', $fileName, 'original_images');
+        $this->image->storeAs('', $fileName, 'manipulated_images');
+        $this->emit('imageUploaded', $fileName);
     }
 
     public function render()
