@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Factories\ManipulationsFactory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -38,7 +39,9 @@ class ImageHandler extends Component
     /**
      * @var string[]
      */
-    protected $listeners = ['imageUploaded' => 'handleNewImage'];
+    protected $listeners = [
+        'imageUploaded' => 'handleNewImage',
+    ];
 
     public function mount(): void
     {
@@ -67,7 +70,23 @@ class ImageHandler extends Component
         $this->image = $this->getDisk()->url($fileName);
     }
 
-    public function manipulate(Manipulations $manipulations): void
+    public function updatedManipulations(): void
+    {
+        $this->manipulate(ManipulationsFactory::make($this->manipulations));
+    }
+
+    /**
+     * @return View
+     */
+    public function render()
+    {
+        return view('livewire.image-handler');
+    }
+
+    /**
+     * @param Manipulations $manipulations
+     */
+    private function manipulate($manipulations): void
     {
         $oldFileName = $this->fileName;
         $newFileName = Str::random(32) . '.jpeg';
@@ -80,27 +99,6 @@ class ImageHandler extends Component
         $this->setImage($newFileName);
 
         $this->getDisk()->delete($oldFileName);
-    }
-
-    public function updatedManipulations(): void
-    {
-        $manipulations = new Manipulations();
-
-        foreach ($this->manipulations as $manipulation) {
-            if (method_exists($manipulations, $manipulation)) {
-                $manipulations->{$manipulation}();
-            }
-        }
-
-        $this->manipulate($manipulations);
-    }
-
-    /**
-     * @return View
-     */
-    public function render()
-    {
-        return view('livewire.image-handler');
     }
 
     /**
