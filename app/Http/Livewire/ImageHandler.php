@@ -55,24 +55,26 @@ class ImageHandler extends Component
     /**
      * @param string $fileName
      */
-    public function handleNewImage(string $fileName): void
-    {
-        $this->originalFileName = $fileName;
-        $this->setImage($fileName);
-    }
-
-    /**
-     * @param string $fileName
-     */
     public function setImage(string $fileName): void
     {
         $this->fileName = $fileName;
         $this->image = $this->getDisk()->url($fileName);
     }
 
+    /**
+     * @param string $fileName
+     */
+    public function handleNewImage(string $fileName): void
+    {
+        $this->originalFileName = $fileName;
+        $this->setImage($fileName);
+    }
+
     public function updatedManipulations(): void
     {
-        $this->manipulate(ManipulationsFactory::make($this->manipulations));
+        $this->manipulate(
+            (new ManipulationsFactory($this->manipulations))->make()
+        );
     }
 
     /**
@@ -86,7 +88,7 @@ class ImageHandler extends Component
     /**
      * @param Manipulations $manipulations
      */
-    private function manipulate($manipulations): void
+    private function manipulate(Manipulations $manipulations): void
     {
         $oldFileName = $this->fileName;
         $newFileName = Str::random(32) . '.jpeg';

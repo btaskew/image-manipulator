@@ -15,32 +15,50 @@ class ManipulationsFactory
     ];
 
     /**
+     * @var array
+     */
+    private array $manipulations = [];
+
+    /**
      * @param array $manipulations
+     */
+    public function __construct(array $manipulations)
+    {
+        $this->setManipulations($manipulations);
+    }
+
+    /**
      * @return Manipulations
      */
-    public static function make(array $manipulations): Manipulations
+    public function make(): Manipulations
     {
-        $manipulationsToApply = [];
+        return new Manipulations([$this->manipulations]);
+    }
+
+    /**
+     * @param array $manipulations
+     */
+    private function setManipulations(array $manipulations): void
+    {
+        $this->manipulations = [];
 
         foreach ($manipulations as $manipulation => $value) {
-            if (!static::isToggleManipulation($manipulation)) {
-                $manipulationsToApply[$manipulation] = $value;
+            if (!$this->isToggleManipulation($manipulation)) {
+                $this->manipulations[$manipulation] = $value;
             }
 
             if ($value) {
-                $manipulationsToApply['filter'] = $manipulation;
+                $this->manipulations['filter'] = $manipulation;
             }
         }
-
-        return new Manipulations([$manipulationsToApply]);
     }
 
     /**
      * @param string $manipulation
      * @return bool
      */
-    private static function isToggleManipulation(string $manipulation): bool
+    private function isToggleManipulation(string $manipulation): bool
     {
-        return in_array($manipulation, static::TOGGLE_MANIPULATIONS);
+        return in_array($manipulation, self::TOGGLE_MANIPULATIONS);
     }
 }
