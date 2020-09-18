@@ -78,6 +78,16 @@ class ImageHandler extends Component
     }
 
     /**
+     * @return string
+     */
+    public function getImageContainerHeightProperty(): string
+    {
+        $imageHeight = getimagesize($this->image)[1];
+
+        return $imageHeight < 300 ? $imageHeight . 'px' : '30rem';
+    }
+
+    /**
      * @return View
      */
     public function render()

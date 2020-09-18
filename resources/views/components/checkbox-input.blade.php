@@ -1,6 +1,6 @@
 @props(['field', 'label'])
 
-<div class="mt-3">
+<div class="mt-4">
     <label class="md:w-2/3 block text-gray-700 font-bold flex items-center">
         <input
             class="mr-2 leading-tight"

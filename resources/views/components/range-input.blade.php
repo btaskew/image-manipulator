@@ -1,6 +1,6 @@
 @props(['field', 'label', 'min' => 0, 'max' => 100])
 
-<div class="mt-3">
+<div class="mt-4">
     <label class="md:w-2/3 block text-gray-700 font-bold" for="{{ $field }}">{{ $label }}</label>
     <div class="text-gray-600 font-bold flex">
         <span>{{ $min }}</span>
