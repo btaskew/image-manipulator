@@ -19,7 +19,7 @@ class ImageHandler extends Component
     /**
      * @var string|null
      */
-    public ?string $image = null;
+    public ?string $imageSource = null;
 
     /**
      * @var string
@@ -55,15 +55,6 @@ class ImageHandler extends Component
     /**
      * @param string $fileName
      */
-    public function setImage(string $fileName): void
-    {
-        $this->fileName = $fileName;
-        $this->image = $this->getDisk()->url($fileName);
-    }
-
-    /**
-     * @param string $fileName
-     */
     public function handleNewImage(string $fileName): void
     {
         $this->originalFileName = $fileName;
@@ -82,7 +73,7 @@ class ImageHandler extends Component
      */
     public function getImageContainerHeightProperty(): string
     {
-        $imageHeight = getimagesize($this->image)[1];
+        $imageHeight = getimagesize($this->imageSource)[1];
 
         return $imageHeight < 300 ? $imageHeight . 'px' : '30rem';
     }
@@ -103,14 +94,32 @@ class ImageHandler extends Component
         $oldFileName = $this->fileName;
         $newFileName = Str::random(32) . '.jpeg';
 
-        Image::load($this->getOriginalDisk()->path($this->originalFileName))
-            ->setTemporaryDirectory('temp')
-            ->manipulate($manipulations)
-            ->save($this->getDisk()->path($newFileName));
+        $this->generateManipulatedImage($manipulations, $newFileName);
 
         $this->setImage($newFileName);
 
         $this->getDisk()->delete($oldFileName);
+    }
+
+    /**
+     * @param Manipulations $manipulations
+     * @param string        $fileName
+     */
+    private function generateManipulatedImage(Manipulations $manipulations, string $fileName): void
+    {
+        Image::load($this->getOriginalDisk()->path($this->originalFileName))
+            ->setTemporaryDirectory('temp')
+            ->manipulate($manipulations)
+            ->save($this->getDisk()->path($fileName));
+    }
+
+    /**
+     * @param string $fileName
+     */
+    private function setImage(string $fileName): void
+    {
+        $this->fileName = $fileName;
+        $this->imageSource = $this->getDisk()->url($fileName);
     }
 
     /**

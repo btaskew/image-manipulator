@@ -1,12 +1,12 @@
 <div style="max-width: 80%; min-width: 50%">
-    @if(!$image)
+    @if(!$imageSource)
         @livewire('upload-image-form')
     @else
         <div class="border border-3 rounded p-8 bg-white mt-4 mb-4 flex items-center">
             <div class="img-container p-3 border border-3 rounded mr-4 flex" style="height: {{ $this->imageContainerHeight }}">
                 <img
                     class="img-actual w-auto m-auto max-h-full"
-                    src="{{ $image }}"
+                    src="{{ $imageSource }}"
                     alt="If you can see this message your image was not uploaded successfully. Please refresh the page and try again."
                 >
             </div>
@@ -26,7 +26,6 @@
                     <x-checkbox-input label="Sepia" field="sepia" />
                 </x-control-group>
             </div>
-
         </div>
     @endif
 </div>
