@@ -20,8 +20,8 @@
             <br />
 
             <x-control-group title="Adjustments">
-                <x-range-input label="Brightness" field="brightness" />
-                <x-range-input label="Contrast" field="contrast" />
+                <x-range-input label="Brightness" field="brightness" min="-100" />
+                <x-range-input label="Contrast" field="contrast" min="-100" />
             </x-control-group>
 
         </div>
